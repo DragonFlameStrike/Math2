@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
-	"strings"
 )
 
 var aArr []float64
@@ -16,30 +14,96 @@ var alpha []float64
 var beta []float64
 var matrix [][]float64
 var n, m int
+var eps, gamma float64
 var s []string
 var xArr []float64
 
+const (
+	test0 = iota
+	test1
+	test2
+	test3
+)
+
 func main() {
 
-	bytes, err := os.ReadFile("data")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fileText := string(bytes[:])
-	s = strings.Split(fileText, ",")
-	filter()
-	n, m = getMatrixSize(s)
-	if n != m {
-		fmt.Println("n!=m")
+	if len(os.Args) != 5 {
+		fmt.Println("Input args: n eps gamma testNumber")
 		return
+		//bytes, err := os.ReadFile("data")
+		//if err != nil {
+		//	log.Fatal(err)
+		//}
+		//fileText := string(bytes[:])
+		//s = strings.Split(fileText, ",")
+		//filter()
+		//n, m = getMatrixSizeFromFile(s)
+		//if n != m {
+		//	fmt.Println("n!=m")
+		//	return
+		//}
+		//matrix = getMatrixFromFile(n)
+		//getFFromFile(n)
+		//getABCFromMatrix(n)
+	} else {
+		n, _ = strconv.Atoi(os.Args[1])
+		eps, _ = strconv.ParseFloat(os.Args[2], 8)
+		gamma, _ = strconv.ParseFloat(os.Args[3], 8)
+		test, _ := strconv.Atoi(os.Args[4])
+		aArr = make([]float64, 0)
+		bArr = make([]float64, 0)
+		cArr = make([]float64, 0)
+		fArr = make([]float64, 0)
+		switch test {
+		case test1:
+			for i := 0; i < n; i++ {
+				if i != n-1 {
+					cArr = append(cArr, -1)
+				}
+				if i != 0 {
+					aArr = append(aArr, -1)
+				}
+				bArr = append(bArr, 2)
+			}
+			for i := 0; i < n; i++ {
+				fArr = append(fArr, 2)
+			}
+		case test2:
+			for i := 0; i < n; i++ {
+				if i != n-1 {
+					cArr = append(cArr, -1)
+				}
+				if i != 0 {
+					aArr = append(aArr, -1)
+				}
+				bArr = append(bArr, 2)
+			}
+			for i := 0; i < n; i++ {
+				fArr = append(fArr, 2+eps)
+			}
+		case test3:
+			for i := 1; i <= n; i++ {
+				if i != n {
+					cArr = append(cArr, -1)
+				}
+				if i != 1 {
+					aArr = append(aArr, -1)
+				}
+				bArr = append(bArr, float64(2*i)+gamma)
+			}
+			for i := 1; i <= n; i++ {
+				fArr = append(fArr, float64(2*(i+1))+gamma)
+			}
+		}
 	}
-	matrix = getMatrix(n)
-	getF(n)
-	getABC(n)
+
 	fmt.Println(aArr, bArr, cArr, fArr)
+	fmt.Println()
 	getAlphaBeta(n)
 	fmt.Println(alpha, beta)
+	fmt.Println()
 	runX(n)
+	fmt.Println("x:")
 	fmt.Println(xArr)
 
 }
@@ -69,7 +133,7 @@ func getAlphaBeta(size int) {
 	}
 }
 
-func getABC(size int) {
+func getABCFromMatrix(size int) {
 	aArr = make([]float64, 0)
 	bArr = make([]float64, 0)
 	cArr = make([]float64, 0)
@@ -100,13 +164,13 @@ func remove(slice []string, s int) []string {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func getMatrixSize(s []string) (int, int) {
+func getMatrixSizeFromFile(s []string) (int, int) {
 	n, _ = strconv.Atoi(s[0])
 	m, _ = strconv.Atoi(s[1])
 	return n, m
 }
 
-func getF(size int) {
+func getFFromFile(size int) {
 	fArr = make([]float64, 0)
 	for j := 0; j < size; j++ {
 		el, _ := strconv.Atoi(s[2+j])
@@ -114,7 +178,7 @@ func getF(size int) {
 	}
 }
 
-func getMatrix(size int) [][]float64 {
+func getMatrixFromFile(size int) [][]float64 {
 	m := make([][]float64, size)
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
